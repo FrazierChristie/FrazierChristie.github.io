@@ -137,6 +137,7 @@ html, body {
 		margin: 50px auto;
 		text-align: center;
 		padding: 20px 15px;
+		align-items: center;
 	}
 	
 	#password input {
@@ -156,11 +157,9 @@ html, body {
 	#password label {
 		font-family: nexaLight, sans-serif;
 	}	
-	#password input[type="submit"] {
-		text-align: center;
-		align-content: center;
+	#password input[type="button"]{
+		align-self: center;
 	}
-
 
 
 
