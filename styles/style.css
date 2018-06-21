@@ -65,7 +65,7 @@ html, body {
 	color: purple;
 	border: solid purple 1px;
 }
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1081px) {
 	.content img {
 		width: 85%;
 		height: 85%;
