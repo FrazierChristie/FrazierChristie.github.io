@@ -67,26 +67,22 @@ html, body {
 }
 @media screen and (max-width: 768px) {
 	.content img {
-		width: 70%;
-		height: 70%;
+		width: 85%;
+		height: 85%;
 	}
 	.content h1 {
-		font-size: 80%;
+		font-size: 90%;
 		padding-left: 80px;
 		padding-right: 80px;
 		max-width: 200px
 		text-align: center;
 	}
-	.btn1 {
-		font-size: 80%;
+	.btn {
+		font-size: 90%;
 		padding: 7px 15px;
 	}
-	.btn2 {
-		font-size: 80%;
-		padding: 7px 25px;
-	}
 	.content h2 {
-		font-size: 70%;
+		font-size: 85%;
 		padding-bottom: 10px;
 	}
 	.intro{
