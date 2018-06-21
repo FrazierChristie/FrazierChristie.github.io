@@ -156,6 +156,10 @@ html, body {
 	#password label {
 		font-family: nexaLight, sans-serif;
 	}	
+	#password input[type="submit"] {
+		text-align: center;
+		align-content: center;
+	}
 
 
 
