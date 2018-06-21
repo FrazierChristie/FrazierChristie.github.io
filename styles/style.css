@@ -156,9 +156,8 @@ html, body {
 	#password label {
 		font-family: nexaLight, sans-serif;
 	}	
-	#mc-embedded-subscribe.button {
-		align-self: center;
-		text-align: center;
+	#mailchimp input.button {
+		margin: auto;
 	}
 
 
