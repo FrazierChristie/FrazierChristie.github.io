@@ -77,9 +77,13 @@ html, body {
 		max-width: 200px
 		text-align: center;
 	}
-	.btn {
+	.btn1 {
 		font-size: 80%;
 		padding: 7px 15px;
+	}
+	.btn2 {
+		font-size: 80%;
+		padding: 7px 25px;
 	}
 	.content h2 {
 		font-size: 70%;
