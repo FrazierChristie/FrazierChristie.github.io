@@ -12,14 +12,14 @@ function destroyChart(id) {
 }
 
 const COLORS = {
-    primary: '#3b82f6',
-    secondary: '#8b5cf6',
+    primary: '#ffffff',
+    secondary: '#999999',
     success: '#22c55e',
     warning: '#f59e0b',
     danger: '#ef4444',
-    muted: '#64748b',
-    gridColor: 'rgba(148, 163, 184, 0.1)',
-    textColor: '#94a3b8'
+    muted: '#666666',
+    gridColor: 'rgba(255, 255, 255, 0.06)',
+    textColor: '#999999'
 };
 
 const defaultOptions = {
@@ -89,7 +89,7 @@ export function renderE1RMChart(canvasId, history) {
                 label: 'Est. 1RM (kg)',
                 data: history.map(h => h.e1rm),
                 borderColor: COLORS.primary,
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
                 borderWidth: 2,
                 pointRadius: 3,
                 fill: true
@@ -137,7 +137,7 @@ export function renderMuscleBalanceChart(canvasId, muscleData) {
             datasets: [{
                 label: 'Volume',
                 data: values.map(v => Math.round(v / maxVal * 100)),
-                backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
                 borderColor: COLORS.primary,
                 borderWidth: 2,
                 pointRadius: 3,
