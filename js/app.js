@@ -13,7 +13,7 @@ import { initPlanPage, generatePlan } from './pages/plan.js';
 import { initAnalyticsPage, switchAnalyticsTab } from './pages/analytics.js';
 import { initHistoryPage, filterHistory, deleteWorkoutConfirm } from './pages/history.js';
 import { initHealthPage, saveHealthData, importHealthData } from './pages/health.js';
-import { initSettingsPage, saveProfile, exportData, importData, clearAllData, disconnectStrava } from './pages/settings.js';
+import { initSettingsPage, saveProfile, exportData, importData, clearAllData, disconnectStrava, saveApiKey } from './pages/settings.js';
 import { initGearPage, addGear, deleteGear } from './pages/gear.js';
 
 // --- Global API exposed on window.fitcoach for onclick handlers ---
@@ -46,6 +46,7 @@ window.fitcoach = {
     importData,
     clearAllData,
     disconnectStrava,
+    saveApiKey,
     // Gear page
     addGear,
     deleteGear

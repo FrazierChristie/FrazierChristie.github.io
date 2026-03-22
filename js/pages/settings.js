@@ -2,6 +2,7 @@
 import { registerPage, showToast, showModal } from '../ui.js';
 import { dbGet, dbPut, dbClear, exportAllData, importAllData } from '../db.js';
 import { isStravaConnected, logout } from '../auth.js';
+import { getApiKey, setApiKey } from '../services/llmService.js';
 
 export function initSettingsPage() {
     registerPage('settings', loadSettingsPage);
@@ -10,6 +11,19 @@ export function initSettingsPage() {
 async function loadSettingsPage() {
     await loadProfile();
     loadStravaStatus();
+    loadApiKey();
+}
+
+function loadApiKey() {
+    const el = document.getElementById('settings-api-key');
+    const key = getApiKey();
+    if (el && key) el.value = key;
+}
+
+export function saveApiKey() {
+    const key = document.getElementById('settings-api-key')?.value || '';
+    setApiKey(key);
+    showToast(key ? 'API key saved' : 'API key removed', 'success');
 }
 
 async function loadProfile() {

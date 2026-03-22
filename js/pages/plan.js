@@ -3,6 +3,8 @@ import { registerPage, showToast, showLoading, hideLoading } from '../ui.js';
 import { generateTrainingPlan, savePlan, getActivePlan, getPlanWorkouts } from '../engines/coachEngine.js';
 import { dbPut, dbGet, generateId } from '../db.js';
 import { formatDateISO, formatDate, addDays, getMonday } from '../utils.js';
+import { hasApiKey, generatePlanWithLLM } from '../services/llmService.js';
+import { EXERCISES } from '../../data/exercises.js';
 
 let currentPlanWeek = 0;
 let planWorkouts = [];
@@ -120,32 +122,75 @@ export async function generatePlan() {
         return;
     }
 
-    showLoading('Generating training plan...');
+    const goal = {
+        id: generateId(),
+        type: goalType,
+        description: goalDesc || '',
+        targetDate: goalDate,
+        createdAt: new Date().toISOString()
+    };
 
+    const profile = {
+        experienceLevel: goalLevel || 'intermediate',
+        trainingDays: parseInt(goalDays) || 4,
+        currentWeeklyDistance: parseFloat(weeklyKm) || 20
+    };
+
+    // Load user profile for extra context
     try {
-        const goal = {
-            id: generateId(),
-            type: goalType,
-            description: goalDesc || '',
-            targetDate: goalDate,
-            createdAt: new Date().toISOString()
-        };
-        await dbPut('goals', goal);
+        const userProfile = await dbGet('profile', 'user');
+        if (userProfile) {
+            if (userProfile.weight) profile.weight = userProfile.weight;
+            if (userProfile.age) profile.age = userProfile.age;
+        }
+    } catch (_) { /* ignore */ }
 
-        const profile = {
-            experienceLevel: goalLevel || 'intermediate',
-            trainingDays: parseInt(goalDays) || 4,
-            currentWeeklyDistance: parseFloat(weeklyKm) || 20
-        };
+    if (hasApiKey()) {
+        showLoading('AI coach is building your plan...');
+        try {
+            await dbPut('goals', goal);
+            const llmWorkouts = await generatePlanWithLLM(goal, profile, EXERCISES);
 
-        const { plan, workouts } = generateTrainingPlan(goal, profile);
-        await savePlan(plan, workouts);
+            const plan = {
+                id: generateId(),
+                goalId: goal.id,
+                periodisationType: 'ai',
+                startDate: formatDateISO(new Date()),
+                endDate: goalDate,
+                currentPhase: 0,
+                currentWeek: 1,
+                status: 'active',
+                createdAt: new Date().toISOString()
+            };
 
-        hideLoading();
-        showToast(`Plan created: ${workouts.length} sessions over ${Math.ceil(workouts.length / parseInt(goalDays))} weeks`, 'success');
-        location.hash = 'plan';
-    } catch (e) {
-        hideLoading();
-        showToast('Failed to generate plan: ' + e.message, 'error');
+            // Add IDs and planId to each workout
+            const workouts = llmWorkouts.map(w => ({
+                ...w,
+                id: generateId(),
+                planId: plan.id,
+                status: w.status || 'upcoming'
+            }));
+
+            await savePlan(plan, workouts);
+            hideLoading();
+            showToast(`AI plan created: ${workouts.length} sessions`, 'success');
+            location.hash = 'plan';
+        } catch (e) {
+            hideLoading();
+            showToast('AI plan failed: ' + e.message, 'error');
+        }
+    } else {
+        showLoading('Generating training plan...');
+        try {
+            await dbPut('goals', goal);
+            const { plan, workouts } = generateTrainingPlan(goal, profile);
+            await savePlan(plan, workouts);
+            hideLoading();
+            showToast(`Plan created: ${workouts.length} sessions`, 'success');
+            location.hash = 'plan';
+        } catch (e) {
+            hideLoading();
+            showToast('Failed to generate plan: ' + e.message, 'error');
+        }
     }
 }

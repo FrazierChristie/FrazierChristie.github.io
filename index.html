@@ -106,12 +106,12 @@
 
             <div class="card">
                 <h3>Fitness and Fatigue</h3>
-                <canvas id="chart-fitness" height="200"></canvas>
+                <div class="chart-container"><canvas id="chart-fitness"></canvas></div>
             </div>
 
             <div class="card">
                 <h3>Weekly Training Load</h3>
-                <canvas id="chart-weekly-load" height="160"></canvas>
+                <div class="chart-container chart-sm"><canvas id="chart-weekly-load"></canvas></div>
             </div>
         </div>
     </main>
@@ -303,15 +303,15 @@
                     <div class="form-group">
                         <select id="e1rm-exercise-select"><option value="">Select exercise...</option></select>
                     </div>
-                    <canvas id="chart-e1rm" height="200"></canvas>
+                    <div class="chart-container"><canvas id="chart-e1rm"></canvas></div>
                 </div>
                 <div class="card">
                     <h3>Weekly Volume Load</h3>
-                    <canvas id="chart-volume" height="200"></canvas>
+                    <div class="chart-container"><canvas id="chart-volume"></canvas></div>
                 </div>
                 <div class="card">
                     <h3>Muscle Group Balance</h3>
-                    <canvas id="chart-muscle-balance" height="250"></canvas>
+                    <div class="chart-container chart-md"><canvas id="chart-muscle-balance"></canvas></div>
                 </div>
                 <div class="card">
                     <h3>Personal Records</h3>
@@ -322,30 +322,30 @@
             <div id="analytics-cardio-analytics" class="hidden">
                 <div class="card">
                     <h3>Pace Progression</h3>
-                    <canvas id="chart-pace" height="200"></canvas>
+                    <div class="chart-container"><canvas id="chart-pace"></canvas></div>
                 </div>
                 <div class="card">
                     <h3>Weekly Distance</h3>
-                    <canvas id="chart-distance" height="200"></canvas>
+                    <div class="chart-container"><canvas id="chart-distance"></canvas></div>
                 </div>
                 <div class="card">
                     <h3>Elevation Analysis</h3>
-                    <canvas id="chart-elevation" height="200"></canvas>
+                    <div class="chart-container"><canvas id="chart-elevation"></canvas></div>
                 </div>
             </div>
 
             <div id="analytics-body-analytics" class="hidden">
                 <div class="card">
                     <h3>Weight Trend</h3>
-                    <canvas id="chart-weight" height="200"></canvas>
+                    <div class="chart-container"><canvas id="chart-weight"></canvas></div>
                 </div>
                 <div class="card">
                     <h3>Sleep and HRV Trends</h3>
-                    <canvas id="chart-health-trends" height="200"></canvas>
+                    <div class="chart-container"><canvas id="chart-health-trends"></canvas></div>
                 </div>
                 <div class="card">
                     <h3>Readiness History</h3>
-                    <canvas id="chart-readiness" height="200"></canvas>
+                    <div class="chart-container"><canvas id="chart-readiness"></canvas></div>
                 </div>
             </div>
         </div>
@@ -460,6 +460,15 @@
                     </select>
                 </div>
                 <button class="btn btn-primary" onclick="window.fitcoach.saveProfile()">Save Profile</button>
+            </div>
+            <div class="card">
+                <h3>AI Coach</h3>
+                <p class="text-muted">Add your Anthropic API key to get AI-generated training plans tailored to your goals.</p>
+                <div class="form-group">
+                    <label>Anthropic API Key</label>
+                    <input type="password" id="settings-api-key" placeholder="sk-ant-...">
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="window.fitcoach.saveApiKey()">Save Key</button>
             </div>
             <div class="card">
                 <h3>Strava</h3>
