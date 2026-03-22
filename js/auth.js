@@ -1,6 +1,6 @@
 // js/auth.js — Strava OAuth authentication
 
-const STRAVA_CLIENT_ID = '143540'; // Users should replace with their own
+const STRAVA_CLIENT_ID = '214986';
 const REDIRECT_URI = window.location.origin + window.location.pathname;
 
 export function redirectToStrava() {
