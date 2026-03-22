@@ -1,83 +1,528 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
-	<title>The Independent Baby Shop</title>
-	<link rel="stylesheet" type="text/css" href="styles/style.css">
-	<link href="//cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css">
-	<style type="text/css">
-	#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
-	</style>
-	<script type="text/javascript">
-		function toggle_div_fun(id, id2) {
-			var divelement = document.getElementById(id);
-			var divelement2 = document.getElementById(id2);
-
-			if(!divelement.style.display || divelement.style.display == "none") {
-				divelement.style.display = "block";
-			}
-			else
-				divelement.style.display = "none";
-
-			if(divelement2.style.display == "block") {
-				divelement2.style.display = "none";
-			}
-		}
-	</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FitCoach — Training Tracker & Coach</title>
+    <meta name="description" content="The ultimate fitness tracker and AI coach. Track strength and cardio, get periodised training plans, sync with Strava.">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4AA;</text></svg>">
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 <body>
-	<section class="intro">
-		<div class="inner">
-			<div class="content">
-				<img src="TIBS-Logo.png" alt="The Independent Baby Store Logo">
-				<h1>Our marketplace will be home to carefully selected, unique items from the best independent baby stores. Passionate about supporting small businesses. <br> <br> Coming Soon. </h1>
-				<h2>I am a...</h2>
-				<a onclick="toggle_div_fun('mailchimp','password');" class="btn" href="#"> Customer</a>
-				<a onclick="toggle_div_fun('password','mailchimp');" class="btn" href="#"> &nbsp;&nbsp;Seller&nbsp;&nbsp;</a>
-			</div>	
-				<!-- Begin MailChimp Signup Form -->
-<div id="mailchimp">
-<form action="https://theindependentbabyshop.us18.list-manage.com/subscribe/post?u=262d7c6608d41ea28233d21a1&amp;id=3332206db0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-    <div id="mc_embed_signup_scroll">
-	
 
-	<input type="text" size="30" value="First Name" name="FNAME" class="required" id="mce-FNAME" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;">
-	
-	<input type="email" size="30" value="Email Address" name="EMAIL" class="required email" id="mce-EMAIL" onfocus="if(this.value==this.defaultValue)this.value='';" onblur="if(this.value=='')this.value=this.defaultValue;">
-	
-	<div id="mce-responses" class="clear">
-		<div class="response" id="mce-error-response" style="display:none"></div>
-		<div class="response" id="mce-success-response" style="display:none"></div>
-	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_262d7c6608d41ea28233d21a1_3332206db0" tabindex="-1" value=""></div>
-    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-    </div>
-</form>
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="hidden">
+    <div class="loading-spinner"></div>
+    <p id="loading-message">Loading...</p>
 </div>
 
-<div id="password">
-	<form>
-    <label for="pswd">Please enter your seller password </label>
-    <input type="password" id="pswd">
-    <input type="button" value="Submit" onclick="checkPswd();" />
-</form>
-<!--Function to check password the already set password is TIBS458-->
-<script type="text/javascript">
-    function checkPswd() {
-        var confirmPassword = "TIBS458";
-        var password = document.getElementById("pswd").value;
-        if (password == confirmPassword) {
-             window.location.href="http://home.theindependentbabyshop.com";
-        }
-        else{
-            alert("Password Incorrect - Please try again or contact us");
-        }
-    }
-</script>
+<!-- Toast Container -->
+<div id="toast-container"></div>
 
-<!--End mc_embed_signup-->
-			
-		</div>	
-	</section>
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title"></h2>
+            <button id="modal-close" class="modal-close-btn">&times;</button>
+        </div>
+        <div id="modal-body"></div>
+        <div id="modal-actions" class="modal-actions"></div>
+    </div>
+</div>
 
+<!-- Login Section -->
+<div id="login-section">
+    <div class="login-container">
+        <div class="login-logo">&#x1F4AA;</div>
+        <h1>FitCoach</h1>
+        <p class="login-subtitle">Your AI Training Partner</p>
+        <p class="login-desc">Track strength and cardio workouts, get science-based periodised training plans, and sync with Strava.</p>
+        <div class="login-actions">
+            <button id="btn-strava-connect" class="btn btn-strava">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>
+                Connect with Strava
+            </button>
+            <button id="btn-skip-login" class="btn btn-secondary">Continue without Strava</button>
+        </div>
+        <p class="login-privacy">Your data is stored locally on this device. Nothing is sent to external servers.</p>
+    </div>
+</div>
 
+<!-- App Section -->
+<div id="app-section" class="hidden">
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+        <div class="top-bar-left">
+            <span class="app-name">FitCoach</span>
+        </div>
+        <div class="top-bar-right">
+            <div id="readiness-badge" class="readiness-badge hidden" title="Today's readiness score">
+                <span id="readiness-value">--</span>
+            </div>
+            <button id="btn-sync" class="btn-icon" title="Sync Strava">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Page: Dashboard -->
+    <main id="page-dashboard" class="page">
+        <div class="page-content">
+            <div id="coach-insights" class="card coach-card">
+                <h3>Coach</h3>
+                <div id="insights-list" class="insights-list">
+                    <p class="text-muted">Loading insights...</p>
+                </div>
+            </div>
+
+            <div id="todays-workout" class="card">
+                <h3>Today's Session</h3>
+                <div id="today-workout-content">
+                    <p class="text-muted">No session planned for today</p>
+                </div>
+            </div>
+
+            <div class="card-row">
+                <div class="card stat-card">
+                    <span class="stat-label">This Week</span>
+                    <span id="stat-week-sessions" class="stat-value">0</span>
+                    <span class="stat-unit">sessions</span>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-label">Volume</span>
+                    <span id="stat-week-volume" class="stat-value">0</span>
+                    <span class="stat-unit">kg</span>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-label">Distance</span>
+                    <span id="stat-week-distance" class="stat-value">0</span>
+                    <span class="stat-unit">km</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Fitness and Fatigue</h3>
+                <canvas id="chart-fitness" height="200"></canvas>
+            </div>
+
+            <div class="card">
+                <h3>Weekly Training Load</h3>
+                <canvas id="chart-weekly-load" height="160"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- Page: Log Workout -->
+    <main id="page-log" class="page hidden">
+        <div class="page-content">
+            <h2>Log Workout</h2>
+            <div class="tabs">
+                <button class="tab active" data-tab="strength" onclick="window.fitcoach.switchLogTab('strength')">Strength</button>
+                <button class="tab" data-tab="cardio" onclick="window.fitcoach.switchLogTab('cardio')">Cardio</button>
+                <button class="tab" data-tab="quick" onclick="window.fitcoach.switchLogTab('quick')">Quick Log</button>
+            </div>
+
+            <div id="log-strength" class="log-section">
+                <div class="card">
+                    <div class="form-group">
+                        <label>Search Exercise</label>
+                        <input type="text" id="exercise-search" placeholder="Type to search exercises..." autocomplete="off">
+                        <div id="exercise-results" class="exercise-dropdown hidden"></div>
+                    </div>
+                </div>
+                <div id="workout-exercises" class="workout-exercises"></div>
+                <div class="form-group">
+                    <label>Overall RPE (1-10)</label>
+                    <div class="rpe-slider">
+                        <input type="range" id="strength-rpe" min="1" max="10" value="7">
+                        <span id="strength-rpe-value" class="rpe-display">7</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="strength-notes" rows="2" placeholder="How did the session feel?"></textarea>
+                </div>
+                <button id="btn-save-strength" class="btn btn-primary btn-block" onclick="window.fitcoach.saveStrengthWorkout()">Save Workout</button>
+            </div>
+
+            <div id="log-cardio" class="log-section hidden">
+                <div class="card">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Activity Type</label>
+                            <select id="cardio-type">
+                                <option value="Run">Run</option>
+                                <option value="Ride">Ride</option>
+                                <option value="Swim">Swim</option>
+                                <option value="Row">Row</option>
+                                <option value="Walk">Walk</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="cardio-date">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Distance (km)</label>
+                            <input type="number" id="cardio-distance" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (mm:ss)</label>
+                            <input type="text" id="cardio-duration" placeholder="30:00">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Avg Heart Rate</label>
+                            <input type="number" id="cardio-hr" placeholder="145">
+                        </div>
+                        <div class="form-group">
+                            <label>Elevation (m)</label>
+                            <input type="number" id="cardio-elevation" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>RPE (1-10)</label>
+                        <div class="rpe-slider">
+                            <input type="range" id="cardio-rpe" min="1" max="10" value="5">
+                            <span id="cardio-rpe-value" class="rpe-display">5</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="cardio-notes" rows="2" placeholder="How did it feel?"></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="window.fitcoach.saveCardioWorkout()">Save Cardio Workout</button>
+            </div>
+
+            <div id="log-quick" class="log-section hidden">
+                <div id="quick-log-list">
+                    <p class="text-muted">Your recent workouts will appear here for quick repeating.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Page: Training Plan -->
+    <main id="page-plan" class="page hidden">
+        <div class="page-content">
+            <div class="page-header">
+                <h2>Training Plan</h2>
+                <button class="btn btn-primary btn-sm" onclick="location.hash='plan-setup'">New Plan</button>
+            </div>
+            <div id="plan-content">
+                <div id="no-plan" class="empty-state">
+                    <div class="empty-icon">&#x1F4CB;</div>
+                    <h3>No Active Plan</h3>
+                    <p>Set your goals and let the coach build a periodised training plan.</p>
+                    <button class="btn btn-primary" onclick="location.hash='plan-setup'">Create Plan</button>
+                </div>
+                <div id="plan-calendar" class="hidden">
+                    <div id="plan-week-nav" class="week-nav">
+                        <button class="btn-icon" id="plan-prev-week">&larr;</button>
+                        <span id="plan-week-label">Week 1</span>
+                        <button class="btn-icon" id="plan-next-week">&rarr;</button>
+                    </div>
+                    <div id="plan-days" class="plan-days"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Page: Plan Setup -->
+    <main id="page-plan-setup" class="page hidden">
+        <div class="page-content">
+            <h2>Set Your Goal</h2>
+            <div class="card">
+                <div class="form-group">
+                    <label>What is your primary goal?</label>
+                    <select id="goal-type">
+                        <option value="hybrid">Hybrid: Run + Lift</option>
+                        <option value="race">Race Performance</option>
+                        <option value="strength">Strength Target</option>
+                        <option value="general">General Fitness</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Describe your goal</label>
+                    <input type="text" id="goal-description" placeholder="e.g., Sub-4hr marathon, 140kg squat...">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Target Date</label>
+                        <input type="date" id="goal-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Training Days / Week</label>
+                        <select id="goal-days">
+                            <option value="3">3 days</option>
+                            <option value="4" selected>4 days</option>
+                            <option value="5">5 days</option>
+                            <option value="6">6 days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Experience Level</label>
+                    <select id="goal-level">
+                        <option value="beginner">Beginner (under 1 year)</option>
+                        <option value="intermediate" selected>Intermediate (1-3 years)</option>
+                        <option value="advanced">Advanced (3+ years)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Current Weekly Running Distance (km)</label>
+                    <input type="number" id="goal-weekly-km" placeholder="20" value="20">
+                </div>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="window.fitcoach.generatePlan()">Generate Training Plan</button>
+            <button class="btn btn-secondary btn-block" onclick="location.hash='plan'">Cancel</button>
+        </div>
+    </main>
+
+    <!-- Page: Analytics -->
+    <main id="page-analytics" class="page hidden">
+        <div class="page-content">
+            <h2>Analytics</h2>
+            <div class="tabs">
+                <button class="tab active" data-tab="strength-analytics" onclick="window.fitcoach.switchAnalyticsTab('strength-analytics')">Strength</button>
+                <button class="tab" data-tab="cardio-analytics" onclick="window.fitcoach.switchAnalyticsTab('cardio-analytics')">Cardio</button>
+                <button class="tab" data-tab="body-analytics" onclick="window.fitcoach.switchAnalyticsTab('body-analytics')">Body</button>
+            </div>
+
+            <div id="analytics-strength-analytics">
+                <div class="card">
+                    <h3>Estimated 1RM Progression</h3>
+                    <div class="form-group">
+                        <select id="e1rm-exercise-select"><option value="">Select exercise...</option></select>
+                    </div>
+                    <canvas id="chart-e1rm" height="200"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Weekly Volume Load</h3>
+                    <canvas id="chart-volume" height="200"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Muscle Group Balance</h3>
+                    <canvas id="chart-muscle-balance" height="250"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Personal Records</h3>
+                    <div id="pr-board"></div>
+                </div>
+            </div>
+
+            <div id="analytics-cardio-analytics" class="hidden">
+                <div class="card">
+                    <h3>Pace Progression</h3>
+                    <canvas id="chart-pace" height="200"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Weekly Distance</h3>
+                    <canvas id="chart-distance" height="200"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Elevation Analysis</h3>
+                    <canvas id="chart-elevation" height="200"></canvas>
+                </div>
+            </div>
+
+            <div id="analytics-body-analytics" class="hidden">
+                <div class="card">
+                    <h3>Weight Trend</h3>
+                    <canvas id="chart-weight" height="200"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Sleep and HRV Trends</h3>
+                    <canvas id="chart-health-trends" height="200"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Readiness History</h3>
+                    <canvas id="chart-readiness" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Page: History -->
+    <main id="page-history" class="page hidden">
+        <div class="page-content">
+            <h2>Workout History</h2>
+            <div class="card filter-bar">
+                <select id="history-type-filter">
+                    <option value="all">All Types</option>
+                    <option value="strength">Strength</option>
+                    <option value="cardio">Cardio</option>
+                </select>
+                <input type="date" id="history-date-from">
+                <input type="date" id="history-date-to">
+                <button class="btn btn-sm" onclick="window.fitcoach.filterHistory()">Filter</button>
+            </div>
+            <div id="history-list" class="workout-history-list"></div>
+        </div>
+    </main>
+
+    <!-- Page: Health -->
+    <main id="page-health" class="page hidden">
+        <div class="page-content">
+            <h2>Health and Readiness</h2>
+            <div class="card readiness-card">
+                <div class="readiness-score-large">
+                    <div id="readiness-circle" class="readiness-circle">
+                        <span id="readiness-score-value">--</span>
+                    </div>
+                    <p id="readiness-recommendation" class="readiness-rec">Log health data to see readiness</p>
+                </div>
+                <div id="readiness-factors"></div>
+            </div>
+            <div class="card">
+                <h3>Log Today's Health</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sleep (hours)</label>
+                        <input type="number" id="health-sleep" step="0.1" placeholder="7.5">
+                    </div>
+                    <div class="form-group">
+                        <label>HRV (ms)</label>
+                        <input type="number" id="health-hrv" placeholder="45">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Resting HR (bpm)</label>
+                        <input type="number" id="health-rhr" placeholder="55">
+                    </div>
+                    <div class="form-group">
+                        <label>Sleep Quality (1-10)</label>
+                        <input type="number" id="health-quality" min="1" max="10" placeholder="7">
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="window.fitcoach.saveHealthData()">Save Health Data</button>
+            </div>
+            <div class="card">
+                <h3>Import Apple Health Data</h3>
+                <p class="text-muted">Import from Apple Health XML export or Health Auto Export CSV.</p>
+                <input type="file" id="health-import-file" accept=".xml,.csv" onchange="window.fitcoach.importHealthData(event)">
+            </div>
+        </div>
+    </main>
+
+    <!-- Page: Gear -->
+    <main id="page-gear" class="page hidden">
+        <div class="page-content">
+            <div class="page-header">
+                <h2>Gear Tracker</h2>
+                <button class="btn btn-primary btn-sm" onclick="window.fitcoach.addGear()">Add Gear</button>
+            </div>
+            <div id="gear-list"></div>
+        </div>
+    </main>
+
+    <!-- Page: Settings -->
+    <main id="page-settings" class="page hidden">
+        <div class="page-content">
+            <h2>Settings</h2>
+            <div class="card">
+                <h3>Profile</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="settings-name" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" id="settings-age" placeholder="30">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="settings-weight" step="0.1" placeholder="75">
+                    </div>
+                    <div class="form-group">
+                        <label>Height (cm)</label>
+                        <input type="number" id="settings-height" placeholder="178">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Experience Level</label>
+                    <select id="settings-level">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="window.fitcoach.saveProfile()">Save Profile</button>
+            </div>
+            <div class="card">
+                <h3>Strava</h3>
+                <div id="strava-status"><p class="text-muted">Not connected</p></div>
+            </div>
+            <div class="card">
+                <h3>Data Management</h3>
+                <div class="btn-group-vertical">
+                    <button class="btn btn-secondary" onclick="window.fitcoach.exportData()">Export All Data (JSON)</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Import Data</button>
+                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="window.fitcoach.importData(event)">
+                    <button class="btn btn-danger" onclick="window.fitcoach.clearAllData()">Clear All Data</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Page: More -->
+    <main id="page-more" class="page hidden">
+        <div class="page-content">
+            <h2>More</h2>
+            <div class="menu-list">
+                <button class="menu-item" onclick="location.hash='history'">&#x1F4DC; Workout History</button>
+                <button class="menu-item" onclick="location.hash='health'">&#x2764;&#xFE0F; Health and Readiness</button>
+                <button class="menu-item" onclick="location.hash='gear'">&#x1F45F; Gear Tracker</button>
+                <button class="menu-item" onclick="location.hash='settings'">&#x2699;&#xFE0F; Settings</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-page="dashboard">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </button>
+        <button class="nav-item" data-page="log">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Log</span>
+        </button>
+        <button class="nav-item" data-page="plan">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Plan</span>
+        </button>
+        <button class="nav-item" data-page="analytics">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Analytics</span>
+        </button>
+        <button class="nav-item" data-page="more">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            <span>More</span>
+        </button>
+    </nav>
+</div>
+
+<!-- Rest Timer -->
+<div id="rest-timer" class="rest-timer hidden">
+    <div class="rest-timer-display">
+        <span id="rest-timer-value">0:00</span>
+    </div>
+    <button class="btn btn-sm" onclick="window.fitcoach.dismissRestTimer()">Dismiss</button>
+</div>
+
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
